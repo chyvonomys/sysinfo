@@ -97,6 +97,7 @@ pub struct Process {
     cwd: PathBuf,
     root: PathBuf,
     memory: u64,
+    memory_real: u64,
     parent: Option<Pid>,
     status: ProcessStatus,
     handle: HandleWrapper,
@@ -169,6 +170,7 @@ impl ProcessExt for Process {
                     root: root,
                     status: ProcessStatus::Run,
                     memory: 0,
+                    memory_real: 0,
                     cpu_usage: 0.,
                     old_cpu: 0,
                     old_sys_cpu: 0,
@@ -189,6 +191,7 @@ impl ProcessExt for Process {
                 root: PathBuf::new(),
                 status: ProcessStatus::Run,
                 memory: 0,
+                memory_real: 0,
                 cpu_usage: 0.,
                 old_cpu: 0,
                 old_sys_cpu: 0,
@@ -236,6 +239,10 @@ impl ProcessExt for Process {
 
     fn memory(&self) -> u64 {
         self.memory
+    }
+
+    fn memory_real(&self) -> u64 {
+        self.memory_real
     }
 
     fn parent(&self) -> Option<Pid> {
@@ -474,7 +481,8 @@ pub fn update_memory(p: &mut Process) {
         if GetProcessMemoryInfo(*p.handle,
                                 &mut pmc as *mut PROCESS_MEMORY_COUNTERS_EX as *mut c_void as *mut PROCESS_MEMORY_COUNTERS,
                                 size_of::<PROCESS_MEMORY_COUNTERS_EX>() as DWORD) != 0 {
-            p.memory = (pmc.PrivateUsage as u64) >> 10u64; // / 1024;
+            p.memory = (pmc.PrivateUsage as u64) / 1024;
+            p.memory_real = (pmc.WorkingSetSize as u64) / 1024;
         }
     }
 }

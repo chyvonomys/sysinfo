@@ -205,9 +205,7 @@ impl Query {
         let internal = Arc::clone(&self.internal);
         self.thread = Some(
             thread::spawn(move || {
-                loop {
-                    internal.record();
-                }
+                while internal.record() { }
             }));
     }
 }

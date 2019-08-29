@@ -105,6 +105,8 @@ impl SystemExt for System {
             network: network::new(),
             uptime: get_uptime(),
         };
+
+        /*
         // TODO: in case a translation fails, it might be nice to log it somewhere...
         if let Some(ref mut query) = s.query {
             let x = unsafe { load_symbols() };
@@ -221,6 +223,7 @@ impl SystemExt for System {
             }
             query.start();
         }
+        */
         s.refresh_specifics(refreshes);
         s
     }
